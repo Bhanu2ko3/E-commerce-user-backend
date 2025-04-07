@@ -7,7 +7,9 @@ exports.createOrder = async (req, res) => {
 
     // Validate required fields
     if (!products || !Array.isArray(products) || products.length === 0) {
-      return res.status(400).json({ message: "Products array is required and cannot be empty" });
+      return res
+        .status(400)
+        .json({ message: "Products array is required and cannot be empty" });
     }
     if (!totalPrice || isNaN(totalPrice)) {
       return res.status(400).json({ message: "Valid totalPrice is required" });
@@ -27,10 +29,24 @@ exports.createOrder = async (req, res) => {
     });
 
     await newOrder.save();
-    res.status(201).json({ message: "Order placed successfully", order: newOrder });
+    res
+      .status(201)
+      .json({ message: "Order placed successfully", order: newOrder });
   } catch (error) {
     console.error("Error creating order:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Get Orders
+exports.getOrders = async (req, res) => {
+  try {
+    const order = await Order.find();
+    res.status(200).json(order);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Failed to fetch Orders", details: err.message });
   }
 };
 
@@ -67,8 +83,10 @@ exports.getOrdersByUser = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    const orders = await Order.find({ user: userId })
-      .populate("products.product", "name price"); // Populate product details
+    const orders = await Order.find({ user: userId }).populate(
+      "products.product",
+      "name price"
+    ); // Populate product details
 
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: "No orders found for this user" });
@@ -105,7 +123,9 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    res.status(200).json({ message: "Order status updated successfully", order });
+    res
+      .status(200)
+      .json({ message: "Order status updated successfully", order });
   } catch (error) {
     console.error("Error updating order status:", error);
     res.status(500).json({ message: "Internal server error" });

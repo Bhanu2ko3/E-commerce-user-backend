@@ -7,19 +7,31 @@ dotenv.config();
 const app = express();
 
 if (!process.env.MONGO_URI) {
-  console.error("❌ Error: MONGO_URI is not defined in environment variables.");
+  console.error("Error: MONGO_URI is not defined in environment variables.");
   process.exit(1);
 }
 
-app.use(express.json());
-app.use(cors());
+// Configure CORS properly
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
+  })
+);
+
+// Handle preflight requests
+app.options("*", cors());
+
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ MongoDB Connected");
+    console.log("MongoDB Connected");
   } catch (err) {
-    console.error("❌ Error connecting to MongoDB:", err.message);
+    console.error("Error connecting to MongoDB:", err.message);
     process.exit(1);
   }
 };
@@ -41,4 +53,4 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

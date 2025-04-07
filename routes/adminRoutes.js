@@ -4,7 +4,7 @@ const User = require("../models/User");
 const { protect } = require("../middlewares/authMiddleware");
 const { isAdmin } = require("../middlewares/adminMiddleware");
 
-// 🔹 Get All Users (Admin Only)
+//Get All Users (Admin Only)
 router.get("/users", protect, isAdmin, async (req, res) => {
   try {
     const users = await User.find().select("-password");
@@ -14,7 +14,7 @@ router.get("/users", protect, isAdmin, async (req, res) => {
   }
 });
 
-// 🔹 Update User Role (Admin Only)
+//Update User Role (Admin Only)
 router.put("/user/:id", protect, isAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
